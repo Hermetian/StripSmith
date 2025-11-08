@@ -1,0 +1,103 @@
+# Stripsmith Configuration
+
+# Image generation settings
+image:
+  provider: "dalle3"              # dalle3 or stable-diffusion
+  model: "dall-e-3"
+  size: "1024x1024"               # 1024x1024, 1024x1792, 1792x1024
+  quality: "standard"             # standard or hd
+  style: "natural"                # natural or vivid
+
+# Character generation settings
+characters:
+  max_per_panel: 3                # Limit characters per panel
+  sheet_angles: 3                 # Number of reference angles (front, 3/4, profile)
+  generate_expressions: false     # Generate expression sheets (Phase 2)
+
+  # Character prompt template
+  template: "{style}, {name}, {age}, {gender}, {physical_features}, {clothing}, {accessories}"
+
+  # Negative prompt (what to avoid)
+  negative: "multiple people, crowd, anime, realistic photo, 3d render, blurry"
+
+# Panel layout settings
+layout:
+  default_template: "3-panel-grid"  # 3-panel-grid, 4-panel-grid, splash, webtoon
+  gutter_width: 10                  # Pixels between panels
+  page_margin: 20                   # Page margin in pixels
+  page_size: [1200, 1600]          # Width, height in pixels
+
+  # Available templates
+  templates:
+    3-panel-grid: [1, 1, 1]        # Equal height rows
+    4-panel-grid: [1, 1, 1, 1]
+    splash: [1]                     # Full page
+    webtoon: [1, 1, 1, 1, 1, 1]    # Vertical scroll
+
+# Speech bubble settings
+bubbles:
+  font_family: "Arial"              # Font name
+  font_size: 14                     # Base font size
+  padding: 10                       # Internal padding
+  tail_length: 20                   # Bubble tail length
+  border_width: 2                   # Border thickness
+  background_color: "white"
+  border_color: "black"
+  text_color: "black"
+
+# Story analysis settings
+analysis:
+  llm_model: "claude-3-opus-20240229"
+  max_chapters: 50                  # Maximum chapters to process
+  auto_chapter: true                # Auto-detect chapter breaks
+
+  # Character extraction
+  extract_physical: true            # Extract physical descriptions
+  extract_personality: false        # Extract personality (not used for images)
+
+  # Scene/environment extraction
+  extract_environments: true
+  environment_detail: "medium"      # low, medium, high
+
+# Panel breakdown settings
+panels:
+  target_panels_per_page: 3         # Preferred panels per page
+  min_panels: 20                    # Minimum panels per chapter
+  max_panels: 100                   # Maximum panels per chapter
+
+  # Camera angles
+  camera_angles: ["close-up", "medium-shot", "long-shot", "extreme-close-up"]
+  default_camera: "medium-shot"
+
+  # Pacing
+  action_scene_pacing: "fast"       # More panels
+  dialogue_scene_pacing: "slow"     # Fewer panels
+
+# Export settings
+export:
+  format: "pdf"                     # pdf, png, cbz
+  dpi: 300                          # For PDF export
+  compress: true                    # Compress images
+
+  # Output structure
+  separate_pages: true              # One file per page vs. one file
+  include_metadata: true            # Include title, author, etc.
+
+# Processing settings
+processing:
+  batch_size: 5                     # Images to generate in parallel
+  retry_attempts: 3                 # Retry failed generations
+  cache_enabled: true               # Cache intermediate results
+  temp_dir: "data/temp"
+
+# Logging
+logging:
+  level: "INFO"                     # DEBUG, INFO, WARNING, ERROR
+  file: "stripsmith.log"
+  console: true
+
+# Cost tracking
+cost_tracking:
+  enabled: true
+  warn_threshold: 10.0              # Warn if cost exceeds $10
+  currency: "USD"
