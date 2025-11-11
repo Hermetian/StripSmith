@@ -212,7 +212,62 @@ class ImageGenerator:
         # Clean up
         prompt = " ".join(prompt.split())
 
+        # Sanitize for content policy
+        prompt = self._sanitize_prompt(prompt)
+
         return prompt
+
+    def _sanitize_prompt(self, prompt: str) -> str:
+        """
+        Sanitize prompt to avoid DALL-E 3 content policy violations.
+
+        Replaces explicit violence, death, weapons with safer alternatives.
+        """
+        # Lowercase for case-insensitive matching
+        sanitized = prompt
+
+        # Replace problematic terms with safe alternatives
+        replacements = {
+            # Dead bodies / violence
+            r'\bcovered body\b': 'covered figure on the ground',
+            r'\bdead body\b': 'figure on the ground',
+            r'\bcorpse\b': 'figure',
+            r'\bbody\b': 'scene',
+            r'\bpulling back the sheet\b': 'examining the scene',
+            r'\bexamines the body\b': 'examines the scene',
+            r'\bexamining the body\b': 'examining the scene',
+
+            # Blood / gore
+            r'\bblood\b': 'dark stains',
+            r'\bbleeding\b': 'injured',
+            r'\bwounded\b': 'hurt',
+            r'\bgore\b': '',
+
+            # Weapons in threatening contexts
+            r'\bpointing (?:a )?gun\b': 'holding weapon at side',
+            r'\baiming (?:a )?gun\b': 'holding weapon',
+            r'\bfiring (?:a )?gun\b': 'in action',
+            r'\bshooting\b': 'in conflict',
+            r'\bwielding (?:a )?weapon\b': 'holding weapon',
+
+            # Violence
+            r'\bkilling\b': 'confronting',
+            r'\bmurder\b': 'crime',
+            r'\battacking\b': 'confronting',
+            r'\bstabbing\b': 'in conflict',
+            r'\bbeating\b': 'fighting',
+        }
+
+        import re
+        for pattern, replacement in replacements.items():
+            sanitized = re.sub(pattern, replacement, sanitized, flags=re.IGNORECASE)
+
+        # Clean up double spaces
+        sanitized = " ".join(sanitized.split())
+
+        logger.debug(f"Sanitized prompt: {sanitized}")
+
+        return sanitized
 
     def _download_image(self, url: str, output_path: str):
         """Download image from URL to file."""
